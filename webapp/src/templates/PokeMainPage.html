@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pokemon Database</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body style="text-align: center; background-color: gray; padding: 10px;" >
+<h1>Pokemon Database Hub</h1>
+<h2>Search Pokemon</h2>
+
+
+
+
+
+<form action="/get_pokemon" method="POST">
+    <label for="input_name">Select Pokémon:</label>
+    <input type="text" id="input_name" name="input_name" list="pokemon_list" placeholder="Pokemon">
+    <datalist id="pokemon_list">
+        {% for pokemon in pokemon_list %}
+        <option value="{{ pokemon.name }}">
+            {% endfor %}
+    </datalist>
+
+    <label for="input_form"></label>
+    <input type="hidden" id="input_form" name="input_form" list="pokemon_form_list">
+    <datalist id="pokemon_form_list">
+        {% for forms in pokemon_form_list %}
+        <option value="{{ forms.form }}">
+            {% endfor %}
+    </datalist>
+
+    <label for="input_type1">Select Type(s):</label>
+    <select id="input_type1" name="input_type1">
+        <option value="Type 1">Type 1</option>
+        <option value="Normal">Normal</option>
+        <option value="Grass">Grass</option>
+        <option value="Fire">Fire</option>
+        <option value="Water">Water</option>
+        <option value="Electric">Electric</option>
+        <option value="Ground">Ground</option>
+        <option value="Rock">Rock</option>
+        <option value="Steel">Steel</option>
+        <option value="Flying">Flying</option>
+        <option value="Fighting">Fighting</option>
+        <option value="Ice">Ice</option>
+        <option value="Psychic">Psychic</option>
+        <option value="Bug">Bug</option>
+        <option value="Dark">Dark</option>
+        <option value="Ghost">Ghost</option>
+        <option value="Dragon">Dragon</option>
+        <option value="Fairy">Fairy</option>
+        <option value="Poison">Poison</option>
+    </select>
+
+    <label for="input_type2"></label>
+    <select id="input_type2" name="input_type2">
+        <option value="Type 2">Type 2</option>
+        <option value="Normal">Normal</option>
+        <option value="Grass">Grass</option>
+        <option value="Fire">Fire</option>
+        <option value="Water">Water</option>
+        <option value="Electric">Electric</option>
+        <option value="Ground">Ground</option>
+        <option value="Rock">Rock</option>
+        <option value="Steel">Steel</option>
+        <option value="Flying">Flying</option>
+        <option value="Fighting">Fighting</option>
+        <option value="Ice">Ice</option>
+        <option value="Psychic">Psychic</option>
+        <option value="Bug">Bug</option>
+        <option value="Dark">Dark</option>
+        <option value="Ghost">Ghost</option>
+        <option value="Dragon">Dragon</option>
+        <option value="Fairy">Fairy</option>
+        <option value="Poison">Poison</option>
+    </select>
+
+    <input type="submit" value="Find Pokemon">
+<!--    <input id="testInput" value="Test"> -->
+</form>
+
+<!-- Update your script -->
+<script>
+
+
+
+    document.getElementById('input_name').addEventListener('input', function(event) {
+        if(event.target.value.length > 0){
+            console.log('input name length1: ', event.target.value.length);
+            fetchDataAjax();
+        }
+        else{
+            console.log('input name length2: ', event.target.value.length);
+            fetchDataAjax();
+        }
+    });
+    /*document.getElementById('input_form').addEventListener('input', function(event) {
+        if('input_form'.length > 0){
+            fetchData();
+        }
+        else{
+            console.log('input form');
+            fetchData();
+        }
+    });
+    */
+    document.getElementById('input_type1').addEventListener('change', function(event) {
+        //console.log('Type 1: ', event.target.value);
+        //console.log('selectedType1: ', selectedType1.value);
+        //console.log('pokemonDatalist: ', pokemonDatalist);
+        fetchData();
+    });
+    document.getElementById('input_type2').addEventListener('change', function(event) {
+        //console.log('Type 2: ', event.target.value);
+        //console.log('selectedType2: ', selectedType2.value);
+        fetchData();
+    });
+
+    function fetchDataAjax() {
+    console.log('ajax1');
+    const pokemonList = document.getElementById('pokemon_list');
+    $(document).ready(function() {
+        console.log('ajax2');
+
+        var query = $('#input_name').val(); // Moved inside the ready function
+        console.log('ajax3: query: ', query);
+        if (query.length >= 0) { // Adjust this threshold as needed
+            $.ajax({
+                type: 'POST',
+                url: '/ajax_search',
+                dataType: 'json', // Use 'dataType' instead of 'Type'
+                data: { query: query },
+                success: function(response) {
+                    clearDatalistOptions(pokemonList);
+                    console.log('response1: ', response);
+                    // Assuming 'response' is an array of names
+                    response.forEach(function(item) {
+                        console.log('item1: ', item);
+                        // Creating option element for each response item
+                        var option = document.createElement('option');
+                        option.value = item.name; // Assuming item is a string
+                        pokemonList.appendChild(option);
+                        console.log('item2: ', pokemonList);
+                    });
+                    console.log('response: ', response);
+                }
+            });
+        }
+    });
+}
+
+
+
+
+    function fetchData(){
+        const selectedPokemon = document.getElementById('input_name').value;
+        const selectedForm = document.getElementById('input_form').value;
+        const selectedType1 = document.getElementById('input_type1').value;
+        const selectedType2 = document.getElementById('input_type2').value;
+        //const formDatalist = document.getElementById('pokemon_form_list');
+        const pokemonDatalist = document.getElementById('pokemon_list');
+        console.log('LISTs: ', pokemonDatalist);
+
+
+
+        //const pokemonDatalist = document.getElementById('pokemon_list');
+        console.log('SDATALIST: ', pokemonDatalist);
+        console.log('Selected Pokemon: ', selectedPokemon);
+        //console.log('Selected Form: ', selectedForm);
+
+        // Fetch types data for the selected Pokemon
+        fetch('/get_datalist_forms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                input_name: selectedPokemon,
+                input_type1: selectedType1,
+                input_type2: selectedType2
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Convert response to JSON format
+        })
+        .then(data => {
+            console.log('Received data from server: ', data);
+            clearDatalistOptions(pokemonDatalist); // Clear existing options
+
+            // Check if data is not empty and it is an array
+    if (data && Array.isArray(data)) {
+        data.forEach(pokemon => {
+            // Populate datalist with fetched Pokémon names
+            populateDatalist(pokemonDatalist, pokemon.pokemon);
+        });
+    } else {
+        console.log('No Pokemon data received or data is not in the expected format.');
+    }
+
+
+
+
+            /*if (data.types) {
+                console.log('Forms data:', data);
+
+                data.types.forEach(pokemon => {
+                    populateDatalist(pokemonDatalist, pokemon.name); // Populate datalist with fetched forms
+
+                    console.log('Populating form:', form.form);
+                });
+            } else {
+                console.log('No type data received.');
+            }*/
+
+
+
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+//**************************************************************************************************************************************
+    function fetchPokemonWithType(){
+        const pokemonDatalist = document.getElementById('pokemon_list');
+        console.log('SDATALIST: ', pokemonDatalist);
+        // Fetch types data for the selected Pokemon
+        fetch('/get_types', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                input_type1: selectedType1.value,
+                input_type2: selectedType2.value  // Use the selected form value
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Convert response to JSON format
+        })
+
+        .then(data => {
+            console.log('Received types from server:', pokemonDatalist, data.pokemon);  // Log the response from the server
+            clearDatalistOptions(pokemonDatalist); // Clear existing options
+
+            if (data.pokemons){
+                data.pokemons.forEach(pokemon => {
+                    populateDatalist(pokemonDatalist, pokemon.name); // Populate datalist with fetched forms
+                    //console.log('Populating pokemon_from types: ', pokemonDatalist, pokemons.name );
+                });
+            } else {
+                console.log('No Pokemon with types data received.');
+            }
+
+
+
+
+
+
+
+
+
+        })
+
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }; //End of function bracket
+
+
+
+    // Define the clearDatalistOptions function
+    function clearDatalistOptions(datalist) {
+        while (datalist.firstChild) {
+            datalist.removeChild(datalist.firstChild);
+        }
+    }
+
+    // Define the populateDatalist function
+    /*function populateDatalist(datalist, data) {
+        const newOption = document.createElement("option").value;
+        newOption.value = data;
+        const newForm = document.createTextNode(newOption).value;
+        console.log('populateDatalist: ', newOption, newForm, datalist, data);
+        datalist.appendChild(newOption.newForm);
+        //return datalist;
+    }*/
+
+    function populateDatalist(datalist, data) {
+        const newOption = document.createElement("option");
+        newOption.value = data;
+        //const newForm = document.createTextNode(newOption).value;
+        console.log('populateDatalist: ', newOption, datalist, data);
+        datalist.appendChild(newOption);
+    }
+
+
+
+</script>
+
+
+<!--    <input type="text" id="input_form" name="input_form">-->
+
+
+</body>
+</html>
+
+
+
+<!--<script>-->
+<!--    document.getElementById('input_name').addEventListener('change', function(event) {-->
+<!--        const selectedPokemon = this.value;-->
+
+<!--        const formDatalist = document.getElementById('pokemon_form_list');-->
+<!--        clearDatalistOptions(formDatalist);-->
+
+<!--        populateDatalist(formDatalist, 'Hello_world');-->
+<!--        populateDatalist(formDatalist, 'Hello_earth');-->
+
+<!--        fetch('/get_pokemon', {-->
+<!--            method: 'POST',-->
+<!--            headers: { 'Content-Type': 'application/json' },-->
+<!--            body: JSON.stringify({ pokemon: selectedPokemon })-->
+<!--        })-->
+<!--        .then(response => response.json())-->
+<!--        .then(data => {-->
+<!--            clearDatalistOptions(formDatalist);-->
+<!--            data.forms.forEach(form => {-->
+<!--                populateDatalist(formDatalist, form);-->
+<!--            });-->
+<!--        })-->
+<!--        .catch(error => {-->
+<!--            console.error('Error fetching Pokemon forms:', error);-->
+<!--        });-->
+<!--    });-->
+
+<!--    function clearDatalistOptions(datalist) {-->
+<!--        while (datalist.firstChild) {-->
+<!--            datalist.removeChild(datalist.firstChild);-->
+<!--        }-->
+<!--    }-->
+
+<!--    function populateDatalist(datalist, value) {-->
+<!--        const option = document.createElement('option');-->
+<!--        option.value = value;-->
+<!--        datalist.appendChild(option);-->
+<!--    }-->
+<!--</script>-->
+
+
+
+
+
+
+
+
+<!--<form action="/get_pokemon" method="POST">-->
+<!--    <label for="input_name">Enter Pokémon Name:</label>-->
+<!--    <input type="text" id="input_name" name="input_name">-->
+<!--    <input type="text1" id="input_form" name="input_form">-->
+<!--    <input type="submit" value="Find Pokemon">-->
+<!--</form>-->
+
+
+<!--<form action="/get_pokemon" method="POST">-->
+<!--    <label for="input_name">Select Pokémon:</label>-->
+<!--    <select id="input_name" name="input_name">-->
+<!--        {% for pokemon in pokemon_list %}-->
+<!--        <option value="{{ pokemon.name }}">{{ pokemon.name }}</option>-->
+<!--        {% endfor %}-->
+<!--    </select>-->
+<!--    <input type="text1" id="input_form" name="input_form">-->
+<!--    <input type="submit" value="Find Pokemon">-->
+<!--</form>-->
+
+<!--<input type="text" list="words" value=""></input>-->
+<!--<datalist id="words">-->
+<!--    <option value="a">-->
+<!--    <option value="aabby">-->
+<!--    <option value="about">-->
+<!--    <option value="action">-->
+<!--</datalist>-->

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokemon Details</title>
+    <style>
+        .home-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-family: Arial, sans-serif;
+            z-index: 999;
+        }
+        .home-button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+
+<body style="text-align: center; background-color: gray; padding: 10px;" >
+    <a href="/" class="home-button">Home</a>
+    <h1>Pokemon Details</h1>
+    <h2>Name: {{ pokemon.name }}</h2>
+    <h2>ID: {{ pokemon.pokemon_id }}</h2>
+
+    {% if types.type2 %}
+        <h2>Types: {{ types.type1 }} / {{ types.type2 }}</h2>
+    {% else %}
+        <h2>Type: {{ types.type1 }}</h2>
+    {% endif %}
+    <h2>Form: {{ types.form }}</h2>
+
+    <h2>Base Stats</h2>
+    <h3>Base Attack: {{ base_stats.base_attack }} </h3>
+    <h3>Base Defense: {{ base_stats.base_defense }} </h3>
+    <h3>Base Stamina: {{ base_stats.base_stamina }} </h3>
+
+    <form action="/get_dec_inc" method="GET">
+        <input type="hidden" name="id" value="{{ pokemon.id }}">
+
+        <input type="hidden" name="type1" value="{{ types.type1 }}">
+        <input type="hidden" name="type2" value="{{ types.type2 }}">
+
+        <input type="hidden" name="prev_id" value="{{ pokemon.pokemon_id - 1 }}">
+        <input type="hidden" name="next_id" value="{{ pokemon.pokemon_id + 1 }}">
+
+        <input type="submit" name="prev" value="Previous" style="text-align: left;">
+        <input type="submit" name="next" value="Next" style="text-align: right;">
+    </form>
+
+</body>
+</html>
+
