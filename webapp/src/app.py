@@ -1587,7 +1587,7 @@ def index():
 
     #fetch_hashes(db)
     #fetch_super_pokemon_db(db)
-    fetch_base_stats_db(db)
+    #fetch_base_stats_db(db)
     '''table_name = None
     for i in range(3):
         if i == 0:
