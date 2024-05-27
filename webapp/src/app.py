@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sqlalchemy import create_engine, Column, Integer
+from sqlalchemy import create_engine, Column, Integer, desc, asc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -8,6 +8,7 @@ from datetime import datetime
 from flask import Flask, request, flash, url_for, redirect, render_template, jsonify, session, request
 from flask_sqlalchemy import SQLAlchemy
 
+import math
 import json
 from datetime import datetime
 from sqlalchemy import DateTime, Date
@@ -121,22 +122,22 @@ def fetch_super_pokemon_db(db):
                 if (pokemon_form != 'Normal'):
                     #addition = None
                     if (pokemon_form == 'Alola'):
-                        print("Alola")
+                        #print("Alola")
                         addition = ' (Alolan)'
                         pokemon_name = pokemon_info['pokemon_name'] + addition
 
                     elif (pokemon_form == 'Galarian'):
-                        print("Galarian")
+                        #print("Galarian")
                         addition = ' (Galarian)'
                         pokemon_name = pokemon_info['pokemon_name'] + addition
 
                     elif (pokemon_form == 'Hisuian'):
-                        print("Hisui")
+                        #print("Hisui")
                         addition = ' (Hisuian)'
                         pokemon_name = pokemon_info['pokemon_name'] + addition
 
                     elif (pokemon_form == 'Paldea'):
-                        print("Paldea")
+                        #print("Paldea")
                         addition = ' (Paldean)'
                         pokemon_name = pokemon_info['pokemon_name'] + addition
 
@@ -153,14 +154,14 @@ def fetch_super_pokemon_db(db):
                 db.session.add(new_pokemon)
 
             db.session.commit()
-        print("Types info populated successfully")
+        #print("Types info populated successfully")
 
         for pokemon, pokemon_info in response_released_data.items():
             existing_records = super_pokemon_db.query.filter_by(pokemon_id=pokemon_info['id']).all()
             for existing_record in existing_records:
                 existing_record.released = True
             db.session.commit()
-        print("Released info populated successfully")
+        #print("Released info populated successfully")
 
         for pokemon, pokemon_info in response_names_data.items():
             existing_records = super_pokemon_db.query.filter_by(pokemon_id=pokemon_info['id']).all()
@@ -172,7 +173,7 @@ def fetch_super_pokemon_db(db):
                 )
                 db.session.add(new_pokemon)
             db.session.commit()
-        print("Names info populated successfully")
+        #print("Names info populated successfully")
 
         for generation, generation_pokemon in response_generations_data.items():
             for pokemon_info in generation_pokemon:
@@ -180,15 +181,15 @@ def fetch_super_pokemon_db(db):
                 for existing_record in existing_records:
                     existing_record.generation = pokemon_info['generation_number']
                 db.session.commit()
-        print("Generations info populated successfully")
+        #print("Generations info populated successfully")
 
         for shiny, shiny_pokemon in response_shiny_data.items():
             existing_records = super_pokemon_db.query.filter_by(pokemon_id=shiny_pokemon['id']).all()
             for existing_record in existing_records:
                 existing_record.shiny = True
             db.session.commit()
-        print("Shiny info populated successfully")
-        print("SUPER POKEMON TABLE POPULATED SUCCESSFULLY")
+        #print("Shiny info populated successfully")
+        #print("SUPER POKEMON TABLE POPULATED SUCCESSFULLY")
 
     else:
         print("Failed to fetch Pokemon data from the API1")
@@ -357,10 +358,10 @@ class pokemon_forms_db(db.Model):
 # Function to populate the form data table
 def fetch_form_data(db):
     response_pokemon_forms = requests.get("https://pogoapi.net/api/v1/pokemon_forms.json")
-    print("form responcse: {}".format(response_pokemon_forms.status_code))
+    #print("form responcse: {}".format(response_pokemon_forms.status_code))
     if response_pokemon_forms.status_code == 200:
         pokemon_forms_data = response_pokemon_forms.json()
-        print("popform: {}".format(pokemon_forms_data))
+        #print("popform: {}".format(pokemon_forms_data))
         for form_name in pokemon_forms_data:
             form1 = pokemon_forms_db(form=form_name)  # Adjust column name as per your model
             db.session.add(form1)
@@ -1023,7 +1024,7 @@ def fetch_weather_boosts_db(db):
 
 def fetch_hashes(db):
     response = requests.get('https://pogoapi.net/api/v1/api_hashes.json')
-    print("fetch hashes response.status_code = {}".format(response.status_code))
+    ##print("fetch hashes response.status_code = {}".format(response.status_code))
     if response.status_code == 200:
         hash_data = response.json()
         for filename in sorted(hash_data):
@@ -1047,7 +1048,7 @@ def fetch_hashes(db):
                 )
                 db.session.add(new_hash_entry)
                 db.session.commit()
-        print('Hash data fetched and stored successfully')
+        ##print('Hash data fetched and stored successfully')
     else:
         return 'Failed to fetch hash data from the remote API', 500
 
@@ -1084,14 +1085,14 @@ def fetch_base_stats_db(db):
                 )
                 db.session.add(new_base_stats_entry)
         db.session.commit()
-        print("Base Stats table populated successfully")
+        ##print("Base Stats table populated successfully")
     else:
         return "Failed to fetch Pokemon base stats data from the API2"
 
 
 @app.route('/get_datalist_forms', methods=['POST'])
 def get_datalist_forms():
-    print("test")
+    ##print("test")
     if request.method == 'POST':
         input_name = request.json.get('input_name')
         input_type1 = request.json.get('input_type1')
@@ -1102,17 +1103,17 @@ def get_datalist_forms():
                                     super_pokemon_db.pokemon_id).all()]
         pokemon_list = super_pokemon_db.query.filter(super_pokemon_db.id.in_(released_pokemon_ids)).order_by(
             super_pokemon_db.name).all()
-        print(released_pokemon_ids)
-        print(pokemon_list)
+        ##print(released_pokemon_ids)
+        ##print(pokemon_list)
 
         released_pokemon_ids2 = [pokemon.pokemon_id for pokemon in
                                  super_pokemon_db.query.filter(super_pokemon_db.released).all()]
-        print(released_pokemon_ids2)
+        ##print(released_pokemon_ids2)
         pokemon_names = [pokemon.name for pokemon in
                          super_pokemon_db.query.filter(super_pokemon_db.pokemon_id.in_(released_pokemon_ids))
                          .order_by(super_pokemon_db.name)
                          .all()]
-        print(pokemon_names)
+        ##print(pokemon_names)
 
         # Pre-query released Pokémon
         released_pokemon_ids = [released_pokemon.id for released_pokemon in
@@ -1120,26 +1121,26 @@ def get_datalist_forms():
         pokemon_list = super_pokemon_db.query.filter(super_pokemon_db.id.in_(released_pokemon_ids)).order_by(
             super_pokemon_db.name).all()
 
-        print("1: {}, Type1: {}, Type2: {}".format(input_name, input_type1, input_type2))
+        ##print("1: {}, Type1: {}, Type2: {}".format(input_name, input_type1, input_type2))
 
         # 1/0/0
         if input_name and (not input_type1 or input_type1 == "Type 1") and (not input_type2 or input_type2 == "Type 2"):
             if input_name.isdigit():
-                print("2-Pokemon")
+                ##print("2-Pokemon")
                 pokemon = super_pokemon_db.query.filter_by(id=int(input_name)).first()
             else:
                 pokemon = super_pokemon_db.query.filter_by(name=input_name).distinct(super_pokemon_db.name).first()
-                print("3test-Pokemon: {}".format(pokemon))
+                ##print("3test-Pokemon: {}".format(pokemon))
 
             if pokemon:
-                print("3.5-Pokemon: {}".format(pokemon))
+                ##print("3.5-Pokemon: {}".format(pokemon))
                 serialized_no_types = {
                     'pokemons': [{'pokemon': pokemon.name}],
                 }
-                print("4-Serialized forms are: {}".format(serialized_no_types))
+                ##print("4-Serialized forms are: {}".format(serialized_no_types))
                 return jsonify(serialized_no_types)
             else:
-                print("5-Pokemon")
+                ##print("5-Pokemon")
                 return jsonify()
 
         # 0/0/0
@@ -1148,17 +1149,17 @@ def get_datalist_forms():
             reset_menus = {
                 'pokemon': [{'name': pokemon.name} for pokemon in pokemon],
             }
-            print("6-Reset menu is: {}".format(reset_menus))
+            ##print("6-Reset menu is: {}".format(reset_menus))
             return jsonify(reset_menus)
 
         # 0/1/1
         elif not input_name and (input_type1 and input_type1 != "Type 1") and (input_type2 and input_type2 != "Type 2"):
-            print("Both selected: {}, Type2: {}".format(input_type1, input_type2))
+            ##print("Both selected: {}, Type2: {}".format(input_type1, input_type2))
             # pokemon_ids_type1 = [entry.pokemon_id for entry in Types_db.query.with_entities(Types_db.pokemon_id).filter(or_(Types_db.type1 == input_type1, Types_db.type2 == input_type1)).distinct().order_by().all()]
             # pokemon_ids_type2 = [entry.pokemon_id for entry in Types_db.query.with_entities(Types_db.pokemon_id).filter(or_(Types_db.type1 == input_type2, Types_db.type2 == input_type2)).distinct().order_by.all()]
 
 
-            print("2: Type1: {}, Type2: {}".format(input_type1, input_type2))
+            ##print("2: Type1: {}, Type2: {}".format(input_type1, input_type2))
             pokemon_type_ids = [entry.pokemon_id for entry in
                     super_pokemon_db.query.with_entities(super_pokemon_db.pokemon_id).filter(and_(and_(
                                         (or_(super_pokemon_db.type1 == input_type2,
@@ -1173,7 +1174,7 @@ def get_datalist_forms():
                                  .distinct(super_pokemon_db.name).order_by(super_pokemon_db.name)
                                  .all()]
             serialized_pokemon = [{'pokemon': name} for name in pokemon_names]
-            print("Else no name & type1 & type2")
+            ##print("Else no name & type1 & type2")
             return jsonify(serialized_pokemon)
 
 
@@ -1183,7 +1184,7 @@ def get_datalist_forms():
 
         elif not input_name and ((input_type1 == "Type 1") or (input_type2 == "Type 2")):
             if input_type2 != "Type 2":
-                print("2: Type1: {}, Type2: {}".format(input_type1, input_type2))
+                ##print("2: Type1: {}, Type2: {}".format(input_type1, input_type2))
                 pokemon_type_ids = [entry.pokemon_id for entry in
                                     super_pokemon_db.query.with_entities(super_pokemon_db.pokemon_id).filter((
                                         or_(super_pokemon_db.type1 == input_type2,
@@ -1197,33 +1198,33 @@ def get_datalist_forms():
                 return jsonify(serialized_pokemon)
 
             elif input_type1 != "Type 1":
-                print("3: Type1: {}, Type2: {}".format(input_type1, input_type2))
+                ##print("3: Type1: {}, Type2: {}".format(input_type1, input_type2))
                 pokemon_type_ids = [entry.pokemon_id for entry in
                                     super_pokemon_db.query.with_entities(super_pokemon_db.pokemon_id).filter((
                                         or_(super_pokemon_db.type1 == input_type1,
                                             super_pokemon_db.type2 == input_type1)), super_pokemon_db.released)
                                     .distinct(super_pokemon_db.pokemon_id).order_by(super_pokemon_db.pokemon_id).all()]
-                print("Type1: {}".format(pokemon_type_ids))
+                ##print("Type1: {}".format(pokemon_type_ids))
                 #released_pokemons = [pokemon.pokemon_id for pokemon in
                 #                     super_pokemon_db.query.filter(super_pokemon_db.pokemon_id.in_(pokemon_type_ids),
                 #                                               super_pokemon_db.released is True).all()]
-                #print("Type2: {}".format(released_pokemons))
+                ###print("Type2: {}".format(released_pokemons))
                 pokemon_names = [pokemon.name for pokemon in
                                  super_pokemon_db.query.filter(super_pokemon_db.pokemon_id.in_(pokemon_type_ids))
                                  .distinct(super_pokemon_db.name).order_by(super_pokemon_db.name)
                                  .all()]
-                print("Type3: {}".format(pokemon_names))
+                ##print("Type3: {}".format(pokemon_names))
 
                 serialized_pokemon = [{'pokemon': name} for name in pokemon_names]
-                #print(serialized_pokemon)
+                ###print(serialized_pokemon)
                 return jsonify(serialized_pokemon)
             else:
-                print("Else no name & type1 or type2")
+                ##print("Else no name & type1 or type2")
                 return ""
 
 
         else:
-            print("8-Pokemon")
+            ##print("8-Pokemon")
             # return jsonify([])
             return ''
     return render_template('Pokemon_Details.html')
@@ -1234,51 +1235,51 @@ def get_types():
     if request.method == 'POST':
         input_type1 = request.json.get('input_type1')
         input_type2 = request.json.get('input_type2')
-        print("1: Type1: {}, Type2: {}".format(input_type1, input_type2))
+        ##print("1: Type1: {}, Type2: {}".format(input_type1, input_type2))
 
         if (input_type1 == "Type 1") or (input_type2 == "Type 2"):
             if input_type2 != "Type 2":
-                print("2: Type1: {}, Type2: {}".format(input_type1, input_type2))
+                ##print("2: Type1: {}, Type2: {}".format(input_type1, input_type2))
 
 
                 pokemon_ids = [entry.pokemon_id for entry in
                                super_pokemon_db.query.distinct(super_pokemon_db.pokemon_id).order_by(
                                    super_pokemon_db.pokemon_id).filter(
                                    or_(super_pokemon_db.type1 == input_type2, super_pokemon_db.type2 == input_type2))]
-                print("test1: {}".format(pokemon_ids))
+                ##print("test1: {}".format(pokemon_ids))
 
                 pokemon_names = [entry2.name for entry2 in
                                  super_pokemon_db.query.distinct(super_pokemon_db.name).order_by(super_pokemon_db.name).filter(
                                      super_pokemon_db.id.in_(pokemon_ids))]
-                print("test2: {}".format(pokemon_names))
+                ##print("test2: {}".format(pokemon_names))
 
                 serialized_pokemon = {'pokemons': [{'pokemon': name} for name in pokemon_names]}
-                print("test3: {}".format(serialized_pokemon))
+                ##print("test3: {}".format(serialized_pokemon))
 
             elif input_type1 != "Type 1":
-                print("3: Type1: {}, Type2: {}".format(input_type1, input_type2))
+                ##print("3: Type1: {}, Type2: {}".format(input_type1, input_type2))
 
                 pokemon_ids = [entry.pokemon_id for entry in
                                super_pokemon_db.query.distinct(super_pokemon_db.pokemon_id).order_by(
                                    super_pokemon_db.pokemon_id).filter(
                                    or_(super_pokemon_db.type1 == input_type1, super_pokemon_db.type2 == input_type1))]
-                print("test4: {}".format(pokemon_ids))
+                ##print("test4: {}".format(pokemon_ids))
 
                 pokemon_names = [entry2.name for entry2 in
                                  super_pokemon_db.query.distinct(super_pokemon_db.name).order_by(super_pokemon_db.name).filter(
                                      super_pokemon_db.id.in_(pokemon_ids))]
-                print("test5: {}".format(pokemon_names))
+                ##print("test5: {}".format(pokemon_names))
 
                 serialized_pokemon = {'pokemons': [{'pokemon': name} for name in pokemon_names]}
-                print("test6: {}".format(serialized_pokemon))
+                ##print("test6: {}".format(serialized_pokemon))
 
                 return jsonify(serialized_pokemon)
             else:
-                print("Else type1 type2")
+                ##print("Else type1 type2")
                 return ""
 
         else:
-            print("4: Type1: {}, Type2: {}".format(input_type1, input_type2))
+            ##print("4: Type1: {}, Type2: {}".format(input_type1, input_type2))
             pokemon_type1 = super_pokemon_db.query.filter_by(id=input_type1).first()
             pokemon_type2 = super_pokemon_db.query.filter_by(id=input_type2).first()
             pokemon_with_types12 = (pokemon_type1, pokemon_type2)
@@ -1288,11 +1289,12 @@ def get_types():
 @app.route('/get_pokemon', methods=['GET', 'POST'])
 def get_pokemon():
     if request.method == 'POST':
-        input_name = request.form.get('input_name')
+        #input_name = request.form.get('input_name')
+        input_name = request.form.get('input_name') or request.form.get('input_name_prev')
         original_input_type1 = request.form.get('input_type1')
         original_input_type2 = request.form.get('input_type2')
-
-        print("input_type2 {}".format(original_input_type2))
+        ##print("input_name {}".format(input_name))
+        ##print("input_type2 {}".format(original_input_type2))
         pokemon = None
         if input_name == "" or input_name is None:
             pokemon_id = super_pokemon_db.query.order_by(super_pokemon_db.pokemon_id).all()
@@ -1306,29 +1308,29 @@ def get_pokemon():
                                    )
         if input_name:
             if input_name.isdigit():
-                print("test")
+                ##print("test")
 
                 new_pokemon = super_pokemon_db.query.filter_by(pokemon_id=int(input_name)).all()
-                print("pokemons: {}".format(new_pokemon))
+                ##print("pokemons: {}".format(new_pokemon))
                 new_name = new_pokemon[0].name
-                print("new_name: {}".format(new_name))
+                ##print("new_name: {}".format(new_name))
 
                 pokemons = [p for p in new_pokemon if p.form == "Normal" and p.pokemon_id == int(input_name)]
                 input_type1 = new_pokemon[0].type1
-                print("1<10: {}".format(pokemons))
+                ##print("1<10: {}".format(pokemons))
                 # new_name = pokemons[0].name
             else:
                 new_pokemon = super_pokemon_db.query.filter_by(name=input_name).first()
-                print(new_pokemon)
+                ##print(new_pokemon)
                 #TODO: this is where I left off 10:20pm wednesday night
 
                 if not new_pokemon:
                     return "Pokemon with name {} not found.".format(input_name)
-                print("Pokemon new_name: {}".format(new_pokemon.name))
+                ##print("Pokemon new_name: {}".format(new_pokemon.name))
                 new_name = new_pokemon.name
-                print("new_name: {}".format(new_name))
+                ##print("new_name: {}".format(new_name))
                 input_type1 = new_pokemon.type1
-                print("input_type1: {}   input_type2: {}".format(input_type1, original_input_type2))
+                ##print("input_type1: {}   input_type2: {}".format(input_type1, original_input_type2))
 
 
 
@@ -1340,10 +1342,10 @@ def get_pokemon():
             #                    .filter(and_(super_pokemon_db.name == new_name,
             #                                 (or_(super_pokemon_db.type1 == input_type1, super_pokemon_db.type2 == input_type1))))
             #                    .group_by(super_pokemon_db.form).subquery())
-            #    print("Type 2 is null or not provided")
+            #    ##print("Type 2 is null or not provided")
             #else:
             #    input_type2 = new_pokemon.type2
-            #    print("Type 2:{}".format(original_input_type2))
+            #    ##print("Type 2:{}".format(original_input_type2))
 
             #    subquery = (db.session.query(func.max(super_pokemon_db.id)).filter(and_(super_pokemon_db.name == new_name,
             #                                                                            (or_(or_(or_(super_pokemon_db.type1 == input_type1, super_pokemon_db.type2 == input_type1),
@@ -1358,43 +1360,111 @@ def get_pokemon():
 
 
 
-            #print("Subquery: {}".format(subquery))
-            pokemon_id = super_pokemon_db.query.filter_by(name=new_name,form='Normal').order_by(super_pokemon_db.id).first()
+            ###print("Subquery: {}".format(subquery))
+            pokemon_id = super_pokemon_db.query.filter_by(name=new_name,form='Normal',released=True).order_by(super_pokemon_db.pokemon_id).distinct().first()
             if not pokemon_id:
-                print("not pokemon_id")
-                pokemon_id = super_pokemon_db.query.filter_by(name=new_name).order_by(super_pokemon_db.id.asc()).first()
+                ##print("not pokemon_id")
+                pokemon_id = super_pokemon_db.query.filter_by(name=new_name,released=True).order_by(super_pokemon_db.id.asc()).distinct().first()
 
-            #print("pokemon_id: {}".format(pokemon_id.id))
-            #pokemon_id = super_pokemon_db.query.filter_by(name=new_name).order_by(super_pokemon_db.id.desc()).all()
-            #print("pokemon_id: {}".format(pokemon_id))
-            #highest_id = super_pokemon_db.query.filter_by(form=pokemon_id).filter_by(pokemon_id=='Normal').all()
-
-            #print("highest_id: {}".format(highest_id.name))
-            #type_id = super_pokemon_db.query.filter_by(form=pokemon_id.form).first()
             pokemon = pokemon_id
             #pokemon = super_pokemon_db.query.filter_by(id=pokemon_id).first()
-            print("pokemon: {}".format(pokemon))
+            ##print("pokemon: {}".format(pokemon))
             if not pokemon:
                 return "Pokemon not found: {}".format(pokemon)
 
-            # Retrieve the full details of the Pokemon using the found ID
-                                            #pokemon = super_pokemon_db.query.filter_by(id=pokemon_id[0]).all()
-            #pokemon = pokemon_id.filter(pokemon_id).first()
-            #print("pokemon1: {}".format(pokemon))
-            # Retrieve types associated with the found Pokemon based on the form
-            #types = pokemon #super_pokemon_db.query.filter_by(name=pokemon.name,form=pokemon.form).first()
-            #print("types: {}".format(types))
-            print("pokemon2: {}".format(pokemon))
+            ##print("pokemon2: {}".format(pokemon))
             base_stats = base_stats_db.query.filter_by(id=pokemon.id).first()
-            print("base stats: {}".format(base_stats))
+            ##print("base stats: {}".format(base_stats)) 
+            #base_stats = base_stats_db.query.filter_by(pokemon_id=pokemon.id).first()
 
+
+            highest_atk = base_stats_db.query.filter_by(id=base_stats_db.id).order_by(desc(base_stats_db.base_attack)).first()
+            ###print("highest_atk: {}".format(highest_atk))
+            lowest_atk = base_stats_db.query.filter_by(id=base_stats_db.id).order_by(asc(base_stats_db.base_attack)).first()
+            highest_def = base_stats_db.query.filter_by(id=base_stats_db.id).order_by(desc(base_stats_db.base_defense)).first()
+            lowest_def = base_stats_db.query.filter_by(id=base_stats_db.id).order_by(asc(base_stats_db.base_defense)).first()
+            highest_sta = base_stats_db.query.filter_by(id=base_stats_db.id).order_by(desc(base_stats_db.base_stamina)).first()
+            lowest_sta = base_stats_db.query.filter_by(id=base_stats_db.id).order_by(asc(base_stats_db.base_stamina)).first()
+            atk_perc = (base_stats.base_attack)/(highest_atk.base_attack)*100
+            def_perc = (base_stats.base_defense)/(highest_def.base_defense)*100
+            sta_perc = (base_stats.base_stamina)/(highest_sta.base_stamina)*100
+            ##print("base stats: {}".format(base_stats))
+            ##print("atk perc: {}".format(atk_perc))
+            atk_color = None
+            def_color = None
+            sta_color = None
+            if 0 <= atk_perc < 10:
+                atk_color = "percent_color_1"
+            elif 10 <= atk_perc < 20:
+                atk_color = "percent_color_2"
+            elif 20 <= atk_perc < 35:
+                atk_color = "percent_color_3"
+            elif 35 <= atk_perc < 50:
+                atk_color = "percent_color_4"
+            elif 50 <= atk_perc < 75:
+                atk_color = "percent_color_5"
+            elif 75 <= atk_perc <= 100:
+                atk_color = "percent_color_6"
+
+            if 0 <= def_perc < 10:
+                def_color = "percent_color_1"
+            elif 10 <= def_perc < 20:
+                def_color = "percent_color_2"
+            elif 20 <= def_perc < 35:
+                def_color = "percent_color_3"
+            elif 35 <= def_perc < 50:
+                def_color = "percent_color_4"
+            elif 50 <= def_perc < 75:
+                def_color = "percent_color_5"
+            elif 75 <= def_perc <= 100:
+                def_color = "percent_color_6"
+
+            if 0 <= sta_perc < 10:
+                sta_color = "percent_color_1"
+            elif 10 <= sta_perc < 20:
+                sta_color = "percent_color_2"
+            elif 20 <= sta_perc < 35:
+                sta_color = "percent_color_3"
+            elif 35 <= sta_perc < 50:
+                sta_color = "percent_color_4"
+            elif 50 <= sta_perc < 75:
+                sta_color = "percent_color_5"
+            elif 75 <= sta_perc <= 100:
+                sta_color = "percent_color_6"
+
+            CPM40 = 0.790300011634826
+            CPM50 = 0.840300023555755
+            #Max_CP40 = (((base_stats.base_attack + 15) * ((base_stats.base_defense + 15) ** 0.5) * ((base_stats.base_stamina + 15) ** 0.5) * ((7903001 / 10) ** 2)) / 10)
+            Max_CP40 = ((base_stats.base_attack + 15) * ((base_stats.base_defense + 15) ** 0.5) * ((base_stats.base_stamina + 15) ** 0.5) * (0.7903001 ** 2))
+            Max_CP50 = max(10, int(((base_stats.base_attack + 15) / 10) ** 0.5 * ((base_stats.base_defense + 15) / 10) ** 0.5 * ((base_stats.base_stamina + 15) / 10) ** 0.5 * 0.667934002 ** 2))
+            #Max_CP50 = ((base_stats.base_attack + 15) * ((base_stats.base_defense + 15) ** 0.5) * ((base_stats.base_stamina + 15) ** 0.5) * (0.667934002 ** 2))
+            Max_CP40 = round(((base_stats.base_attack + 15) * math.sqrt(base_stats.base_defense + 15) * math.sqrt(base_stats.base_stamina + 15) * (CPM40 ** 2)) / 10)
+            Max_CP50 = round(((base_stats.base_attack + 15) * math.sqrt(base_stats.base_defense + 15) * math.sqrt(base_stats.base_stamina + 15) * (CPM50 ** 2)) / 10)
+            #Max_CP50 = ((base_stats.base_attack + 15) * math.sqrt(base_stats.base_defense + 15) * math.sqrt(base_stats.base_stamina + 15) * (0.667934002 ** 2))
+            #Max_CP50 = 0
+            ##print("Max_CP40: {}".format(Max_CP40))
+            ##print("Max_CP50: {}".format(Max_CP50))
             #if not types:
             #    return "No data found for this Pokemon form"
 
             return render_template('Pokemon_Details.html',
                                            pokemon=pokemon,
                                            types=pokemon,
-                                           base_stats=base_stats
+                                           base_stats=base_stats,
+                                           highest_atk=highest_atk,
+                                           lowest_atk=lowest_atk,
+                                           highest_def=highest_def,
+                                           lowest_def=lowest_def,
+                                           highest_sta=highest_sta,
+                                           lowest_sta=lowest_sta,
+                                           atk_perc=atk_perc,
+                                           def_perc=def_perc,
+                                           sta_perc=sta_perc,
+                                           atk_color=atk_color,
+                                           def_color=def_color,
+                                           sta_color=sta_color,
+                                           Max_CP40=Max_CP40,
+                                           Max_CP50=Max_CP50
                                            )
 
         return render_template('Pokemon_Details.html')
@@ -1419,47 +1489,47 @@ def get_dec_inc():
                     new_id = int(request.args.get('next_id'))
                     button_clicked = 'Next'
 
-                print("GET: {}".format(new_id))
+                ##print("GET: {}".format(new_id))
                 if 1 <= new_id <= 1010:
                     new_pokemon = super_pokemon_db.query.filter_by(pokemon_id=int(new_id)).all()
-                    print("pokemons: {}".format(new_pokemon))
+                    ##print("pokemons: {}".format(new_pokemon))
                     new_name = new_pokemon[0].name #super_pokemon_db.query.filter_by(name=new_id.name).all()
-                    print("new_name: {}".format(new_name))
+                    ##print("new_name: {}".format(new_name))
 
                     pokemon = [p for p in new_pokemon if p.form == "Normal" or p.pokemon_id == int(new_id)]
                     new_type1 = new_pokemon[0].type1
-                    print("1<10: {}".format(pokemon))
+                    ##print("1<10: {}".format(pokemon))
                     if input_type2 is None:
                         subquery = (db.session.query(func.max(super_pokemon_db.id))
                                     .filter(and_(super_pokemon_db.name == new_name,
                                                  (or_(super_pokemon_db.type1 == new_type1, super_pokemon_db.type2 == new_type1))))
                                                   .group_by(super_pokemon_db.form).subquery())
-                        print("Type 2 is null or not provided")
+                        #print("Type 2 is null or not provided")
                     else:
                         new_type2 = new_pokemon[0].type2
-                        print("Type 2:{}".format(input_type2))
+                        #print("Type 2:{}".format(input_type2))
 
                         subquery = (db.session.query(func.max(super_pokemon_db.id)).filter(and_(super_pokemon_db.name == new_name,
                                                                                         (or_(or_(or_(super_pokemon_db.type1 == new_type1, super_pokemon_db.type2 == new_type1),
                                                                                                  (or_(super_pokemon_db.type1 == new_type2, super_pokemon_db.type2 == new_type2))))))
                                                                                    ).group_by(super_pokemon_db.form).subquery())
 
-                    print("Subquery: {}".format(subquery))
+                    #print("Subquery: {}".format(subquery))
                     pokemon_id = db.session.query(super_pokemon_db.id).filter(
                         super_pokemon_db.id.in_(subquery)).order_by(super_pokemon_db.id.desc()).first()
-                    print("pokemon_id: {}".format(pokemon_id))
+                    #print("pokemon_id: {}".format(pokemon_id))
                     if not pokemon_id:
                         return "Pokemon not found"
 
                     # Retrieve the full details of the Pokemon using the found ID
                     pokemon = super_pokemon_db.query.filter_by(id=pokemon_id[0]).first()
-                    print("pokemon1: {}".format(pokemon))
+                    #print("pokemon1: {}".format(pokemon))
                     # Retrieve types associated with the found Pokemon based on the form
                     types = super_pokemon_db.query.filter_by(id=pokemon.id).first()
-                    print("types: {}".format(types))
-                    print("pokemon2: {}".format(pokemon))
+                    #print("types: {}".format(types))
+                    #print("pokemon2: {}".format(pokemon))
                     base_stats = base_stats_db.query.filter_by(id=pokemon.id).first()
-                    print("base stats: {}".format(base_stats))
+                    #print("base stats: {}".format(base_stats))
 
                     if not types:
                         return "No data found for this Pokemon form"
@@ -1497,7 +1567,7 @@ def get_dec_inc():
 def ajax_search():
     query = request.form.get('query')
 
-    print("query: {}".format(query))
+    #print("query: {}".format(query))
     if query:
         pokemons = super_pokemon_db.query.with_entities(super_pokemon_db.released,super_pokemon_db.name).filter(super_pokemon_db.name.ilike('%{}%'.format(query))).distinct().all()
         pokemon_names = []
@@ -1508,23 +1578,23 @@ def ajax_search():
             if pokemon.released:
                 #if pokemon.form == "Normal":
                 pokemon_names.append({'name': pokemon.name})
-                print("______________________")
-                print("{}".format(pokemon.name))
+                #print("______________________")
+                #print("{}".format(pokemon.name))
 
                 #else:
                     #temp_pokemon = ({'name': pokemon.name, ' (': pokemon.form})
-                    #print(temp_pokemon)
+                    ##print(temp_pokemon)
                     #pokemon_names.append(temp_pokemon)
                     #pokemon_names.append({'name': '{} ({})'.format(pokemon.name, pokemon.form)})
-                    #print("______________________")
-                    #print("Not name: {}".format(pokemon.name))
-                    #print("Not form: {}".format(pokemon.form))
-                    #print("Not P_Names: {}".format(pokemon_names))
+                    ##print("______________________")
+                    ##print("Not name: {}".format(pokemon.name))
+                    ##print("Not form: {}".format(pokemon.form))
+                    ##print("Not P_Names: {}".format(pokemon_names))
 
         return jsonify(pokemon_names)
 
     else:
-        print("else")
+        #print("else")
         pokemons = super_pokemon_db.query.with_entities(super_pokemon_db.released, super_pokemon_db.name).order_by(super_pokemon_db.name).distinct().all()
         pokemon_names = []
         for pokemon in pokemons:
@@ -1533,8 +1603,8 @@ def ajax_search():
             if pokemon.released:
                 #if pokemon.form == "Normal":
                 pokemon_names.append({'name': pokemon.name})
-                #print("______________________")
-                print("{}".format(pokemon.name))
+                ##print("______________________")
+                #print("{}".format(pokemon.name))
         return jsonify(pokemon_names)
 
 
@@ -1550,32 +1620,41 @@ def ajax_search():
 '''
 def check_table_empty(table_name):
     #table_name = base_stats_db
-    print("temp")
+    #print("temp")
     count = db.session.query(func.count()).select_from(table_name).scalar()
-    print("CountTables: {}".format(count))
+    #print("CountTables: {}".format(count))
     return count == 0
 
 def check_table_exists(table_name):
     inspector = inspect(db.engine)
-    #print("Inspector: {}".format(inspector))
-    #print("Inspected: {}".format(inspector.get_table_names()))
-    print("__tablename__: {}".format(table_name))
+    ##print("Inspector: {}".format(inspector))
+    ##print("Inspected: {}".format(inspector.get_table_names()))
+    #print("__tablename__: {}".format(table_name))
     if table_name.__tablename__ in inspector.get_table_names():
 
-        print("Table '{}' exists".format(table_name.__tablename__))
+        #print("Table '{}' exists".format(table_name.__tablename__))
         if not check_table_empty(table_name):
-            print("Table '{}' is populated.".format(table_name.__tablename__))
+            #print("Table '{}' is populated.".format(table_name.__tablename__))
             return 1
         else:
-            print("Table '{}' exists but is empty.".format(table_name.__tablename__))
+            #print("Table '{}' exists but is empty.".format(table_name.__tablename__))
             return 2
     else:
-        print("Table Name: {} does not exist.".format(table_name.__tablename__))
+        #print("Table Name: {} does not exist.".format(table_name.__tablename__))
         return 0
 
 '''
 
+def download_png(url, filename, id_num):
 
+    ##print("{}   {}".format(url, filename))
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(filename, 'wb') as file:
+            file.write(response.content)
+        ##print("Downloaded {} successfully.".format(filename))
+    #else:
+        #print("{}  {}  {}".format(id_num, filename, url))
 
 
 
@@ -1583,12 +1662,89 @@ def check_table_exists(table_name):
 @app.route('/')
 def index():
     pokemon_count = super_pokemon_db.query.count()
-    print("Count: {}".format(pokemon_count))
+    #print("Count: {}".format(pokemon_count))
 
     #fetch_hashes(db)
     #fetch_super_pokemon_db(db)
     #fetch_base_stats_db(db)
-    '''table_name = None
+
+
+    '''
+    pre_url = ""
+    for i in range(1,10):
+        folder_name = "fromWeb_specials/normal/generation_{}".format(i)  # Naming the folder based on the iteration value
+        folder_name_shiny = "fromWeb_specials/shiny/generation_{}".format(i)
+        os.makedirs(folder_name, exist_ok=True)  # Create folder if it doesn't exist
+        os.makedirs(folder_name_shiny, exist_ok=True)  # Create folder if it doesn't exist
+        pokemon_list = super_pokemon_db.query.filter_by(generation=i).order_by(super_pokemon_db.pokemon_id).all()
+        url = ""
+        surl = ""
+
+        for pokemon_var in pokemon_list:
+            pokemon_name = pokemon_var.name.lower()  # Assuming the name is stored in lowercase
+            pokemon_form = pokemon_var.form
+
+            if pokemon_form == "Alola":
+                pre_url = "https://img.pokemondb.net/sprites/sun-moon"
+                url = pre_url + "/normal/" + pokemon_name + "-alolan.png"
+                surl = pre_url + "/shiny/" + pokemon_name + "-alolan.png"
+            elif pokemon_form == "Galarian":
+                pre_url = "https://img.pokemondb.net/sprites/sword-shield"
+                url = pre_url + "/normal/" + pokemon_name + "-galarian.png"
+                surl = pre_url + "/shiny/" + pokemon_name + "-galarian.png"
+            
+
+            #elif pokemon_var.form == "Normal":
+                #######if 1 <= i <= 6:
+                    #######pre_url = "https://img.pokemondb.net/sprites/x-y"
+                #elif i == 2:
+                #    pre_url = "https://img.pokemondb.net/sprites/x-y"
+                #elif i == 3:
+                #    pre_url = "https://img.pokemondb.net/sprites/ruby-sapphire"
+                #elif i == 4:
+                #    pre_url = "https://img.pokemondb.net/sprites/diamond-pearl"
+                #elif i == 5:
+                #    pre_url = "https://img.pokemondb.net/sprites/black-white"
+                #elif i == 6:
+                #    pre_url = "https://img.pokemondb.net/sprites/x-y"
+                #########elif 6 < i <= 9:
+                    ##########pre_url = "https://img.pokemondb.net/sprites/go"
+                #elif i == 8:
+                #    pre_url = "https://img.pokemondb.net/sprites/go"
+                #elif i == 9:
+                #    pre_url = "https://img.pokemondb.net/sprites/go"
+                #####else:
+                    #########rint("BAD")
+
+            else:
+                #print("BAD2")
+                pre_url = "https://img.pokemondb.net/sprites/x-y"
+                url = pre_url + "/normal/" + pokemon_name + ".png"
+                surl = pre_url + "/shiny/" + pokemon_name + ".png"
+
+
+            #url = pre_url + "/normal/" + pokemon_name + ".png"
+            ##print(url)
+            pokemon_id_file = pokemon_var.pokemon_id
+            filename = str(pokemon_id_file) + ".png"
+            file_path = os.path.join(folder_name, filename)
+            download_png(url, file_path, pokemon_id_file)
+
+
+
+            #spokemon_name = pokemon_var.name.lower()  # Assuming the name is stored in lowercase
+            #spokemon_id_file = pokemon_var.pokemon_id
+            #url = "https://img.pokemondb.net/sprites/x-y/shiny/" + pokemon_name + ".png"
+            #url = pre_url + "/shiny/" + pokemon_name + ".png"
+            ##print(url)
+            filename = str(pokemon_id_file) + "s.png"
+            file_path = os.path.join(folder_name_shiny, filename)
+            download_png(surl, file_path, pokemon_id_file)
+
+
+    '''
+    '''
+    table_name = None
     for i in range(3):
         if i == 0:
             table_name = hash_data_db
@@ -1596,13 +1752,13 @@ def index():
             table_name = super_pokemon_db
         elif i == 2:
             table_name = base_stats_db
-        print("Table Name: {}".format(table_name))
+        #print("Table Name: {}".format(table_name))
         result = check_table_exists(table_name)
-        print("Result: {}".format(result))
+        #print("Result: {}".format(result))
         if result == 1:
-            print("Table '{}' exists and is populated.".format(table_name))
+            #print("Table '{}' exists and is populated.".format(table_name))
         elif result == 2:
-            print("Table '{}' exists but is empty.".format(table_name))
+            #print("Table '{}' exists but is empty.".format(table_name))
 
 
         else:
@@ -1675,7 +1831,7 @@ def index():
         fetch_form_data(db)
         fetch_alolan(db)
 '''
-        print("indexed")
+        #print("indexed")
 
     pokemon_ids = [pokemon.id for pokemon in super_pokemon_db.query.order_by(super_pokemon_db.id).all()]
 
@@ -1688,7 +1844,8 @@ def index():
     pokemon_list = super_pokemon_db.query.filter(super_pokemon_db.id.in_(released_pokemon_ids)).order_by(
         super_pokemon_db.name).all()
 
-    print("release_pokemon: {}".format(pokemon_list))
+
+    #print("release_pokemon: {}".format(pokemon_list))
     # Fetch distinct Pokemon forms
     pokemon_form_list = super_pokemon_db.query.with_entities(super_pokemon_db.form).distinct().order_by(super_pokemon_db.form).all()
 
@@ -1702,5 +1859,6 @@ def index():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+    #app.run()
     app.run(debug=True)
-    # app.run(host="0.0.0.0", port=8000, debug=True)
+    #app.run(host="0.0.0.0", port=8000, debug=True)
